@@ -1,7 +1,15 @@
       ******************************************************************
        identification division.
        program-id. rv-init.
+       environment division.
+       input-output section.
+       file-control.
+           select fs-inputs assign to "token.txt"
+           organization is line sequential.
        data division.
+       file section.
+       fd  fs-inputs.
+       01  fs-input pic x(80).
        working-storage section.
        copy "curl.cpy" replacing ==:pref:== by ==ws-==.
        01  ws-text pic x(160).
@@ -19,6 +27,12 @@
            if ls-curl is equal to null then
                display "[API] Unable to initialize curl" end-display
                goback
+           end-if.
+      *Read token from token file (if needed)
+           if ls-token(1:1) is equal to space then
+               open input sharing with all fs-inputs
+               read fs-inputs into ls-token end-read
+               close fs-inputs
            end-if.
       *Setup the slist
            initialize ls-chunks.

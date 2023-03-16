@@ -3,26 +3,13 @@
       ******************************************************************
        identification division.
        program-id. rv-test-main.
-       environment division.
-       input-output section.
-       file-control.
-           select fs-inputs assign to "token.txt"
-           organization is line sequential.
        data division.
-       file section.
-       fd  fs-inputs.
-       01  fs-input pic x(80).
        working-storage section.
        copy "rcfg.cpy" replacing ==:pref:== by ==ws==.
        procedure division.
            initialize ws-config.
            move "https://api.revolt.chat" to ws-url.
-      *Read token file
-           open input sharing with all fs-inputs.
-           read fs-inputs into ws-token end-read.
-           close fs-inputs.
            set ws-onrun-pgm to entry "rv-onrun".
-      *
            call "rv-init" using by content ws-config end-call.
            goback.
        end program rv-test-main.
