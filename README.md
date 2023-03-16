@@ -55,3 +55,8 @@ to an specific channel id.
            goback.
        end program rv-onrun.
 ```
+
+## Resources
+Noteworthy resources to aid in development:
+* [Revolt API Reference](https://developers.revolt.chat/api/)
+* [GnuCOBOL FAQ](https://gnucobol.sourceforge.io/faq/index.html)
