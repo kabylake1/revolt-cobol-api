@@ -1,0 +1,17 @@
+*
+!.gitignore
+!build.sh
+!Makefile
+!README.md
+
+!program.cbl
+
+!api.cbl
+!json.cbl
+!rmsg.cpy
+!rqry.cpy
+!rued.cpy
+!rxch.cpy
+!rcfg.cpy
+!curl.cpy
+!glue.c
