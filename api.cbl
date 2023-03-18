@@ -14,15 +14,15 @@
        data division.
        file section.
        fd  fd-token.
-       01  fs-token pic x(80).
+       01  fs-token picture x(80).
        fd  fd-server.
-       01  fs-server pic x(80).
+       01  fs-server picture x(80).
        working-storage section.
        copy "winf.cpy" replacing ==:pref:== by ==ws==
                        ==:levl:== by ==01==.
        copy "curl.cpy" replacing ==:pref:== by ==ws-==.
-       01  ws-text pic x(160).
-       01  ws-count pic 9(8).
+       01  ws-text picture x(160).
+       01  ws-count picture 9(8).
        01  ws-status :tp-int: synchronized.
        linkage section.
        copy "rcfg.cpy" replacing ==:pref:== by ==ls==
@@ -133,8 +133,6 @@
       *instead of the original 0, ???
            move -1 to ws-port in ws-info.
            display "[API] Initializing WebSockets context" end-display.
-           call "config-state" using by reference ls-config
-               by value "write" end-call.
            call "lws-create-context" using
                by reference ws-info
                by reference ls-ws-ctx in ls-config end-call.
@@ -154,8 +152,8 @@
        data division.
        working-storage section.
        copy "curl.cpy" replacing ==:pref:== by ==ws-==.
-       01  ws-endpoint pic x(255).
-       01  ws-response pic x(:rx-bufsize:).
+       01  ws-endpoint picture x(255).
+       01  ws-response picture x(:rx-bufsize:).
        01  ws-frame-len :tp-uint: synchronized.
        01  ws-status :tp-uint: synchronized.
        linkage section.
@@ -183,15 +181,15 @@
        program-id. rv-send-msg.
        data division.
        working-storage section.
-       01  ws-endpoint pic x(255).
-       01  ws-text pic x(:max-msg-len:).
-       01  ws-count pic 9(8).
+       01  ws-endpoint picture x(255).
+       01  ws-text picture x(:max-msg-len:).
+       01  ws-count picture 9(8).
        copy "curl.cpy" replacing ==:pref:== by ==ws-==.
        copy "rmsg.cpy" replacing ==:pref:== by ==ws==
                        ==:levl:== by ==01==.
-       01  ws-response pic x(:rx-bufsize:).
+       01  ws-response picture x(:rx-bufsize:).
        linkage section.
-       01  ls-target pic x(26).
+       01  ls-target picture x(26).
        copy "rmsg.cpy" replacing ==:pref:== by ==ls==
                        ==:levl:== by ==01==.
        copy "rcfg.cpy" replacing ==:pref:== by ==ls==
@@ -241,13 +239,13 @@
        data division.
        working-storage section.
        copy "curl.cpy" replacing ==:pref:== by ==ws-==.
-       01  ws-endpoint pic x(255).
-       01  ws-response pic x(:rx-bufsize:).
-       01  ws-count pic 9(8).
+       01  ws-endpoint picture x(255).
+       01  ws-response picture x(:rx-bufsize:).
+       01  ws-count picture 9(8).
        linkage section.
        copy "rcfg.cpy" replacing ==:pref:== by ==ls==
                        ==:levl:== by ==01==.
-       01  ls-target pic x(26).
+       01  ls-target picture x(26).
        copy "rmsg.cpy" replacing ==:pref:== by ==ls==
                        ==:levl:== by ==01==.
        procedure division using by reference ls-config
@@ -288,8 +286,8 @@
        data division.
        working-storage section.
        copy "curl.cpy" replacing ==:pref:== by ==ws-==.
-       01  ws-endpoint pic x(255).
-       01  ws-response pic x(:rx-bufsize:).
+       01  ws-endpoint picture x(255).
+       01  ws-response picture x(:rx-bufsize:).
        linkage section.
        copy "rcfg.cpy" replacing ==:pref:== by ==ls==
                        ==:levl:== by ==01==.
@@ -316,14 +314,14 @@
        data division.
        working-storage section.
        copy "curl.cpy" replacing ==:pref:== by ==ws-==.
-       01  ws-count pic 9(8).
+       01  ws-count picture 9(8).
        01  ws-write-pgm usage program-pointer.
        01  ws-status :tp-uint: synchronized.
        linkage section.
        copy "rcfg.cpy" replacing ==:pref:== by ==ls==
                        ==:levl:== by ==01==.
-       01  ls-endpoint pic x(255).
-       01  ls-reqtype pic x(4).
+       01  ls-endpoint picture x(255).
+       01  ls-reqtype picture x(4).
        01  ls-response usage pointer.
        procedure division using by reference ls-config
            by value ls-endpoint
@@ -366,9 +364,7 @@
                       by value ws-curlopt-post
                       by value 1 end-call
            end-evaluate.
-           call static "cob_output_refill" end-call.
-      *    set ws-write-pgm to entry "http-output-fill".
-           set ws-write-pgm to entry "cob_output_fill_glue".
+           set ws-write-pgm to entry "http-output-fill".
            call "curl-easy-setopt" using by value ls-curl
                by value ws-curlopt-writefunction
                by value ws-write-pgm end-call.
@@ -392,30 +388,38 @@
        data division.
        file section.
        fd  fs-outputs.
-       01  fs-output pic x(:rx-bufsize:).
+       01  fs-output picture x(:rx-bufsize:).
        working-storage section.
-       01  ws-text pic x(:rx-bufsize:).
-       01  ws-data pic x(:rx-bufsize:) based.
-       01  ws-total :tp-sizet: synchronized.
+       01  ws-text picture x(:rx-bufsize:).
+       01  ws-data picture x(:rx-bufsize:) based.
+       01  ws-total :tp-uint: synchronized.
        linkage section.
        01  ls-data usage is pointer synchronized.
        01  ls-size :tp-sizet: synchronized.
+       01  ls-size-num redefines ls-size :tp-uint: synchronized.
        01  ls-nmemb :tp-sizet: synchronized.
+       01  ls-nmemb-num redefines ls-nmemb :tp-uint: synchronized.
        01  ls-userdata usage is pointer synchronized.
        procedure division using by value ls-data
            by value ls-size
            by value ls-nmemb
            by value ls-userdata.
-      *TODO: Fix this callback
+      *
            initialize ws-text.
-      *    multiply ls-size by ls-nmemb giving ws-total end-multiply.
-           display "TotalSize " ws-total end-display.
+      *
+           multiply ls-size-num by ls-nmemb-num
+               giving ws-total end-multiply.
+      *
+           display "ws-total " ws-total end-display.
            set address of ws-data to ls-data.
            move ws-data(1:ws-total) to ws-text.
-           display "writing " ws-text end-display.
+           display "ws-writing " ws-text end-display.
            open extend fs-outputs.
            write fs-output from ws-text end-write.
            close fs-outputs.
+      *
+           set return-code to ws-total.
+      *
            goback.
        end program http-output-fill.
       ******************************************************************
@@ -431,10 +435,10 @@
                        ==:levl:== by ==01==.
        copy "rcfg.cpy" replacing ==:pref:== by ==ws==
                        ==:levl:== by ==01==.
-       01  ws-count pic 9(8).
+       01  ws-count picture 9(8).
        01  ws-p-vhost usage is pointer.
        01  ws-p-protocol usage is pointer.
-       01  ws-status :tp-int: synchronized.
+       01  ws-status :tp-int:.
        linkage section.
        01  ls-wsi usage is pointer synchronized.
        01  ls-reason :tp-int: synchronized.
@@ -505,8 +509,9 @@
            display "[API] WebSocket writeable" end-display.
        client-established.
            display "[API] WebSocket established" end-display.
-           call "lws-callback-on-writable" using
+           call "lws-set-timer-usecs" using
                by value ls-wsi
+               by value 5000000
                returning omitted end-call.
        client-receive.
            display "[API] WebSocket receive" end-display.
@@ -515,10 +520,10 @@
            call static "cob_print" using by value ls-in end-call.
            display ">" end-display.
            perform client-close.
+           stop run returning 1.
        client-close.
-           set ws-client-wsi to null.
            display "[API] Closing WebSocket" end-display.
-           set ws-wsocket in ws-config to null.
+           set ws-client-wsi in ws-config to null.
            call "lws-get-vhost" using by value ls-wsi
                by reference ws-p-vhost
                returning omitted end-call.
@@ -539,13 +544,14 @@
                by value 5000000
                returning omitted end-call.
        client-receive-pong.
-           display "[API] Received pong!?" end-display.
+           display "[API] Callback Received pong!?" end-display.
            stop run returning 1.
        client-user.
-           call "ws-connect-client" using
-               by reference ws-config
+           display "[API] Callback USER" end-display.
+           call "ws-connect-client" using by reference ws-config
                returning ws-status end-call.
            if ws-status is equal to zero then
+               display "[API] Connecting client!" end-display
                call "lws-get-vhost" using by value ls-wsi
                    by reference ws-p-vhost
                    returning omitted end-call
@@ -567,10 +573,10 @@
        working-storage section.
        copy "wccl.cpy" replacing ==:pref:== by ==ws==
                        ==:levl:== by ==01==.
-       01  ws-zurl-path pic x(160).
-       01  ws-zws-url pic x(80).
-       01  ws-count pic 9(8).
-       01  ws-proto-name pic x(80) value "revolt" & x'00'.
+       01  ws-zurl-path picture x(160).
+       01  ws-zws-url picture x(80).
+       01  ws-count picture 9(8).
+       01  ws-proto-name picture x(80) value "revolt-protocol" & x'00'.
        linkage section.
        copy "rcfg.cpy" replacing ==:pref:== by ==ls==
                        ==:levl:== by ==01==.
@@ -578,7 +584,7 @@
       *Read the state from the file
            display "[API] Initializing WebSocket conn." end-display.
            initialize ws-conn.
-           set ws-context in ws-conn to ls-ws-ctx in ls-config.
+           move ls-ws-ctx in ls-config to ws-context in ws-conn.
            if ws-context in ws-conn is equal to null then
                display "[API] Null context passed to WebSocket"
                " connection builder" end-display
@@ -610,10 +616,6 @@
            set ws-path in ws-conn to address of ws-zurl-path.
       *Enable LCCSCF_USE_SSL=1
            set ws-ssl-connection in ws-conn to 31.
-      *
-           call static "lws-canonical-hostname" using
-               by value ls-ws-ctx in ls-config
-               by reference ws-host in ws-conn end-call.
            set ws-protocol in ws-conn,
                ws-local-protocol in ws-conn to address of ws-proto-name.
            set ws-pwsi to address of ls-client-wsi in ls-config.
@@ -625,8 +627,8 @@
       *
            call "lws-client-connect-via-info" using
                by reference ws-conn
-               by reference ls-wsocket in ls-config end-call.
-           if ls-wsocket is equal to null then
+               by reference ls-client-wsi in ls-config end-call.
+           if ls-client-wsi is equal to null then
                display "[API] Unable to create client WebSocket"
                end-display
                set return-code to 2
@@ -652,10 +654,10 @@
        linkage section.
        copy "rcfg.cpy" replacing ==:pref:== by ==ls==
                        ==:levl:== by ==01==.
-       01  ls-action pic x(16).
+       01  ls-action picture x(16).
        procedure division using by reference ls-config
            by value ls-action.
-      *    display "[API] State begin -> " ls-action(1:1) end-display.
+           display "[API] State begin -> " ls-action(1:1) end-display.
            if ls-action(1:1) is equal to 'w' then
                perform state-write
            else
@@ -663,7 +665,7 @@
                    perform state-read
                end-if
            end-if
-      *    display "[API] State finish -> " ls-action(1:1) end-display.
+           display "[API] State finish -> " ls-action(1:1) end-display.
            goback.
        state-write.
            open output fd-state.
@@ -680,10 +682,10 @@
        program-id. nilfy-at-char.
        data division.
        working-storage section.
-       01  ws-count pic 9(8) computational-5.
+       01  ws-count picture 9(8) computational-5.
        linkage section.
-       01  ls-text pic x(8000).
-       01  ls-char pic x.
+       01  ls-text picture x(8000).
+       01  ls-char picture x.
        procedure division using by reference ls-text
            by value ls-char.
       *
@@ -700,9 +702,9 @@
        program-id. get-protocols.
        data division.
        working-storage section.
-       01  ws-requires-init pic 9 value 1.
-       01  ws-proto-name pic x(80) value "revolt" & x'00'.
-       01  ws-protocols occurs 8 times.
+       01  ws-requires-init picture 9 value 1.
+       01  ws-proto-name picture x(80) value "revolt-protocol" & x'00'.
+       01  ws-protocols occurs 4 times.
            copy "wpns.cpy" replacing ==:pref:== by ==ws==.
        linkage section.
        01  ls-p usage is pointer.
@@ -725,6 +727,8 @@
            end-if.
       *
            initialize ws-protocols(2).
+           initialize ws-protocols(3).
+           initialize ws-protocols(4).
        end program get-protocols.
       ******************************************************************
       *Stub function for testing accurate sizing of elements
@@ -761,3 +765,267 @@
            goback.
        end program c-abi-test.
       ******************************************************************
+
+
+GCobol >>SOURCE FORMAT IS FIXED
+      *-----------------------------------------------------------------
+      * Authors:   Brian Tiffin, Asger Kjelstrup, Simon Sobisch
+      * Date:      19-Oct-2010
+      * Purpose:   Hex Dump display
+      * Tectonics: cobc -c CBL_OC_DUMP.cob
+      *     Usage: export OC_DUMP_EXT=1 for explanatory text on dumps
+      *            (memory address and dump length)
+      *            export OC_DUMP_EXT=Y for extended explanatory text
+      *            (architecture   and endian-order)
+      *-----------------------------------------------------------------
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. CBL_OC_DUMP.
+      *
+       ENVIRONMENT      DIVISION.
+       CONFIGURATION    SECTION.
+      *
+       DATA DIVISION.
+       WORKING-STORAGE SECTION.
+       77  addr                             usage pointer.
+       77  addr2addr                        usage pointer.
+       77  counter               pic 999999 usage comp-5.
+       77  byline                pic 999    usage comp-5.
+       77  offset                pic 999999.
+       01  some                  pic 999    usage comp-5.
+           88 some-is-printable-iso88591
+              values 32 thru 126, 160 thru 255.
+           88 some-is-printable-ebcdic
+              values 64, 65, 74 thru 80, 90 thru 97,
+                     106 thru 111, 121 thru 127, 129 thru 137, 143,
+                     145 thru 153, 159, 161 thru 169, 176,
+                     186 thru 188, 192 thru 201, 208 thru 217, 224,
+                     226 thru 233, 240 thru 249.
+       77  high-var              pic 99     usage comp-5.
+       77  low-var               pic 99     usage comp-5.
+      *
+       01  char-set              pic x(06).
+           88 is-ascii           value 'ASCII'.
+           88 is-ebdic           value 'EBCDIC'.
+           88 is-unknown         value '?'.
+       01  architecture          pic x(06).
+           88 is-32-bit          value '32-bit'.
+           88 is-64-bit          value '64-bit'.
+       01  endian-order          pic x(10).
+           88 is-big-endian-no   value 'Little-Big'.
+           88 is-big-endian-yes  value 'Big-Little'.
+      *
+       77  hex-line              pic x(48).
+       77  hex-line-pointer      pic 9(02) value 1.
+      *
+       77  show                  pic x(16).
+       77  dots                  pic x value '.'.
+       77  dump-dots             pic x.
+      *
+       77  hex-digit             pic x(16)  value '0123456789abcdef'.
+       01  extended-infos        pic x.
+           88 show-extended-infos      values '1', '2', 'Y', 'y'.
+           88 show-very-extended-infos values '2', 'Y', 'y'.
+      *
+       77  len                   pic 999999 usage comp-5.
+       77  len-display           pic 999999.
+      *
+       LINKAGE SECTION.
+       01  buffer                pic x       any length.
+       77  byte                  pic x.
+      *-----------------------------------------------------------------
+       PROCEDURE DIVISION USING buffer.
+      *
+      *MAIN SECTION.
+      *00.
+           perform starting-address
+      *
+           perform varying counter from 0 by 16
+                   until   counter  >=   len
+              move counter to offset
+              move spaces  to hex-line, show
+              move '-'     to hex-line (24:01)
+              move 1       to hex-line-pointer
+              perform varying byline from 1 by 1
+                      until   byline  >  16
+                 if (counter + byline) > len
+                    if byline < 9
+                       move space to hex-line (24:01)
+                    end-if
+                    inspect show (byline:) replacing all spaces by dots
+                    exit perform
+                 else
+                    move buffer (counter + byline : 1) to byte
+                    perform calc-hex-value
+                    if ((some-is-printable-iso88591 and is-ascii) or
+                        (some-is-printable-ebcdic   and is-ebdic)   )
+                       move byte to show (byline:1)
+                    else
+                       move dots to show (byline:1)
+                    end-if
+                 end-if
+              end-perform
+              display offset '  ' hex-line '  ' show
+                      upon SYSERR
+              end-display
+           end-perform
+           display ' '
+                   upon SYSERR
+           end-display
+      *
+           exit program.
+      *-----------------------------------------------------------------
+       CALC-HEX-VALUE SECTION.
+      *00.
+           subtract 1 from function ord(byte) giving some
+           end-subtract
+           divide   some by 16 giving high-var remainder low-var
+           end-divide
+           string hex-digit (high-var + 1:1)
+                  hex-digit (low-var  + 1:1)
+                  space
+                  delimited by size
+                  into hex-line
+                  with pointer hex-line-pointer
+           end-string
+      *
+           exit section.
+      *-----------------------------------------------------------------
+       STARTING-ADDRESS SECTION.
+      *00.
+      * Get the length of the transmitted buffer
+           CALL 'C$PARAMSIZE' USING 1
+              GIVING len
+           END-CALL
+      * If wanted, change the dots to something different than points
+           accept dump-dots from environment 'OC_DUMP_DOTS'
+             not on exception
+                 move dump-dots to dots
+           end-accept
+      *
+           perform TEST-ASCII
+           perform TEST-ENDIAN
+           set addr      to address of buffer
+           set addr2addr to address of addr
+      *
+           if len > 0
+      * To show hex-address, reverse if Big-Little Endian
+              if is-big-endian-yes
+                 set addr2addr up   by LENGTH OF addr
+                 set addr2addr down by 1
+              end-if
+              move 1 to hex-line-pointer
+              perform varying byline from 1 by 1
+                      until byline > LENGTH OF addr
+                 set address of byte to addr2addr
+                 perform calc-hex-value
+                 if is-big-endian-yes
+                    set addr2addr down by 1
+                 else
+                    set addr2addr up   by 1
+                 end-if
+              end-perform
+           end-if
+      *
+      * Get and display characteristics and headline
+           accept extended-infos from environment 'OC_DUMP_EXT'
+           end-accept
+           if show-extended-infos
+              display ' '
+                      upon SYSERR
+              end-display
+              if len > 0
+                 display 'Dump of memory beginning at Hex-address: '
+                          hex-line (1 : 3 * (byline - 1) )
+                          upon SYSERR
+                 end-display
+              end-if
+              move len to len-display
+              display 'Length of memory dump is: ' len-display
+                       upon SYSERR
+              end-display
+              if show-very-extended-infos
+                 perform TEST-64bit
+                 display 'Program runs in '
+                         architecture ' architecture. '
+                         'Char-set is '
+                         function trim (char-set) '.'
+                         upon SYSERR
+                 end-display
+                 display 'Byte order is ' endian-order
+                         ' endian.'
+                         upon SYSERR
+                 end-display
+              end-if
+           end-if
+      *
+      * Do we have anything to dump?
+           if len > 0
+      * Ensure that the passed size is not too big
+              if len > 999998
+                 move 999998 to len, len-display
+                 display 'Warning, only the first '
+                         len-display  ' Bytes are shown!'
+                         upon SYSERR
+                 end-display
+              end-if
+              display ' '
+                      upon SYSERR
+              end-display
+              display 'Offset  '
+                      'HEX-- -- -- -5 -- -- -- -- 10 '
+                      '-- -- -- -- 15 -- '
+                      '  '
+                      'CHARS----1----5-'
+                      upon SYSERR
+              end-display
+           else
+              display ' '
+                      upon SYSERR
+              end-display
+              display 'Nothing to dump.'
+                      upon SYSERR
+              end-display
+           end-if
+      *
+           exit section.
+      *-----------------------------------------------------------------
+       TEST-ASCII SECTION.
+      *Function: Discover if running Ascii or Ebcdic
+      *00.
+           evaluate space
+              when x'20'
+                 set  is-ascii   to true
+              when x'40'
+                 set  is-ebdic   to true
+              when other
+                 set  is-unknown to true
+           end-evaluate
+      *
+           exit section.
+      *-----------------------------------------------------------------
+       TEST-64BIT SECTION.
+      *Function: Discover if running 32/64 bit
+      *00.
+      *    Longer pointers in 64-bit architecture
+           if function length (addr) <= 4
+              set  is-32-bit to true
+           else
+              set  is-64-bit to true
+           end-if
+      *
+           exit section.
+      *-----------------------------------------------------------------
+       TEST-ENDIAN SECTION.
+      *00.
+      *    Number-bytes are shuffled in Big-Little endian
+           move 128 to byline
+           set  address of byte to address of byline
+           if function ord(byte) > 0
+              set  is-big-endian-yes to true
+           else
+              set  is-big-endian-no  to true
+           end-if
+      *
+           exit section.
+      *----------------------------------------------------------------*
+       end program CBL_OC_DUMP.

@@ -3,7 +3,6 @@
            45 :pref:-root usage is pointer.
            45 :pref:-curl usage is pointer.
            45 :pref:-ws-ctx usage is pointer.
-           45 :pref:-wsocket usage is pointer.
            45 :pref:-client-wsi usage is pointer.
            45 :pref:-chunks usage is pointer.
            45 :pref:-oninit-pgm usage is program-pointer.

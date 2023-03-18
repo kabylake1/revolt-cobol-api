@@ -92,7 +92,7 @@
                :tp-uint: synchronized.
       *TODO: do the rest of the fields
       *socks_proxy_address
-           45 filler usage is pointer occurs 512 times.
+           45 filler usage is pointer occurs 64 times.
        >>END-IF
        >>IF WEBSOCKET-ABI = "1"
            45 :pref:-gid

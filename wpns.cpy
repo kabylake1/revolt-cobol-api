@@ -7,7 +7,6 @@
                :tp-sizet: synchronized.
            45 :pref:-id
                :tp-uint: synchronized.
-           45 :pref:-user
-               usage is pointer synchronized.
+           45 :pref:-user usage is pointer synchronized.
            45 :pref:-tx-packet-size
                :tp-sizet: synchronized.

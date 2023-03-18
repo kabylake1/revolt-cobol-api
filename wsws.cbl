@@ -83,7 +83,7 @@
        01  ws-status :tp-int:.
        linkage section.
        01  ls-wsi usage is pointer.
-       01  ls-usecs :tp-int:.
+       01  ls-usecs :tp-ulong:.
        procedure division using by value ls-wsi
            by value ls-usecs.
       *
@@ -105,10 +105,6 @@
        copy "wsws.cpy" replacing ==:pref:== by ==ls-==.
        01  ls-user usage is pointer synchronized.
        01  ls-in usage is pointer synchronized.
-      *TODO: This is a workaround with a bug from GnuCOBOL
-      *where linkage elements not listed on the "USING BY" part of
-      *the procedure will get murdered
-       01  ls-status :tp-int: synchronized.
        01  ls-length :tp-sizet: synchronized.
        procedure division using by value ls-wsi
            by value ls-reason
@@ -133,7 +129,7 @@
        01  ws-status :tp-int:.
        linkage section.
        01  ls-wsi usage is pointer.
-       01  ls-usecs :tp-int:.
+       01  ls-usecs :tp-ulong:.
        procedure division using by value ls-wsi
            by value ls-usecs.
       *
