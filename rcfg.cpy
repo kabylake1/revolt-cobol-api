@@ -1,8 +1,14 @@
       *Configuration variables for the program
-       01  :pref:-config.
-           02 :pref:-url pic x(80).
-           02 :pref:-token pic x(80).
-           02 :pref:-curl usage pointer.
-           02 :pref:-chunks usage pointer.
-           02 :pref:-oninit-pgm usage program-pointer.
-           02 :pref:-onrun-pgm usage program-pointer.
+       :levl: :pref:-config.
+           45 :pref:-root usage is pointer.
+           45 :pref:-curl usage is pointer.
+           45 :pref:-ws-ctx usage is pointer.
+           45 :pref:-wsocket usage is pointer.
+           45 :pref:-client-wsi usage is pointer.
+           45 :pref:-chunks usage is pointer.
+           45 :pref:-oninit-pgm usage is program-pointer.
+           45 :pref:-onrun-pgm usage is program-pointer.
+           45 :pref:-url pic x(80).
+           45 :pref:-ws-url pic x(80).
+           45 :pref:-token pic x(80).
+           45 filler usage is pointer occurs 16 times.

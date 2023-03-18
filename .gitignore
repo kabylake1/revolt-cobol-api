@@ -8,10 +8,27 @@
 
 !api.cbl
 !json.cbl
+
+#c abi
+!glue.c
+!cabi.cpy
+
+#revolt
 !rmsg.cpy
 !rqry.cpy
 !rued.cpy
 !rxch.cpy
 !rcfg.cpy
+
+#curl
+!curl.cbl
 !curl.cpy
-!glue.c
+
+#websockets
+!wsws.cbl
+!watr.cpy
+!wlst.cpy
+!wccl.cpy
+!winf.cpy
+!wpns.cpy
+!wsws.cpy
